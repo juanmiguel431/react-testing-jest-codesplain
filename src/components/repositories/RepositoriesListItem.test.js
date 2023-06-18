@@ -5,7 +5,7 @@ import RepositoriesListItem from './RepositoriesListItem';
 function renderComponent() {
   const repositoryMock = {
     html_url: 'https://github.com/facebook/react',
-    full_name: 'facebook/react', language: 'Javascript', description: 'A Js library', owner: 'Facebook', name: 'react',
+    full_name: 'facebook/react', language: 'Javascript', description: 'A Js library', owner: { login: 'facebook' }, name: 'react',
   };
 
   render(
@@ -27,8 +27,19 @@ test('Shows a link to the github homepage for this repository', async () => {
 });
 
 test('Shows a FileIcon with the appropriate icon', async () => {
-  const { repositoryMock } = renderComponent();
+  renderComponent();
   const icon = await screen.findByRole('img', { name: 'Javascript' });
 
   expect(icon).toHaveClass('js-icon');
+});
+
+test('Shows a Link to the code editor page', async () => {
+  const { repositoryMock } = renderComponent();
+  await screen.findByRole('img', { name: 'Javascript' });
+
+  const link = await screen.findByRole('link', {
+    name: new RegExp(repositoryMock.owner.login)
+  });
+
+  expect(link).toHaveAttribute('href', `/repositories/${repositoryMock.full_name}`);
 });
