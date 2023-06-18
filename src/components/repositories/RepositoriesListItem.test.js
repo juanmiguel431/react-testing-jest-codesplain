@@ -1,14 +1,14 @@
-import { screen, render } from '@testing-library/react';
+import { screen, render, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import RepositoriesListItem from './RepositoriesListItem';
 
-const MockComponent = () => {
-  return <h1>Mocked Component</h1>;
-};
-
-jest.mock('../tree/FileIcon.js', () => {
-  return () => <MockComponent />;
-});
+// const MockComponent = () => {
+//   return <h1>Mocked Component</h1>;
+// };
+//
+// jest.mock('../tree/FileIcon.js', () => {
+//   return () => <MockComponent />;
+// });
 
 test('Shows a link to the github homepage for this repository', async () => {
   const repositoryMock = {
@@ -23,6 +23,10 @@ test('Shows a link to the github homepage for this repository', async () => {
   );
 
   // await screen.findByRole('img', { name: 'Javascript' });
+
+  await act(async () => {
+    await pause();
+  });
 
   // screen.debug();
   // await pause();
