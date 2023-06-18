@@ -1,37 +1,22 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { rest } from 'msw';
-import { setupServer } from 'msw/node';
 import HomeRoute from './HomeRoute';
+import { createServer } from '../test/server';
 
-const handlers = [
-  rest.get('api/repositories', (req, res, ctx) => {
-    const language = req.url.searchParams.get('q').split('language:')[1];
-
-    return res(
-      ctx.json({
+createServer([
+  {
+    path: 'api/repositories',
+    res: (req) => {
+      const language = req.url.searchParams.get('q').split('language:')[1];
+      return {
         items: [
           { id: 1, full_name: `${language}_one` },
           { id: 2, full_name: `${language}_two` },
         ]
-      })
-    );
-  })
-];
-
-const server = setupServer(...handlers);
-
-beforeAll(() => {
-  server.listen();
-});
-
-afterEach(() => {
-  server.resetHandlers();
-});
-
-afterAll(() => {
-  server.close();
-});
+      };
+    }
+  }
+]);
 
 test('Render two links for each language', async () => {
   render(
@@ -39,9 +24,6 @@ test('Render two links for each language', async () => {
       <HomeRoute/>
     </MemoryRouter>
   );
-
-  // await pause();
-  // screen.debug();
 
   const languages = ['javascript', 'typescript', 'rust', 'go', 'python', 'java'];
 
@@ -60,8 +42,4 @@ test('Render two links for each language', async () => {
     expect(links[0]).toHaveAttribute( 'href', `/repositories/${language}_one`);
     expect(links[1]).toHaveAttribute( 'href', `/repositories/${language}_two`);
   }
-});
-
-const pause = () => new Promise(resolve => {
-  setTimeout(resolve, 100);
 });
